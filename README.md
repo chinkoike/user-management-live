@@ -36,3 +36,9 @@ npm install
 npm run dev
 
 ```
+
+![Home Page](images/home.png)
+![Admin login](images/admin-login.png)
+![Dashboard for admin](images/dashboard.png)
+![Client login](images/client-login.png)
+![Task page for client](images/taskpage.png)
