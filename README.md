@@ -21,15 +21,18 @@ A full-stack user management system built for learning and portfolio purposes.
 
 ### Backend
 
-````bash
+```bash
 cd server
 npm install
 npm run dev
 
+```
+
 ### Frontend
+
 ```bash
 cd client
 npm install
 npm run dev
 
-````
+```
