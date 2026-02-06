@@ -73,7 +73,7 @@ function UserTable({
         </thead>
         <tbody>
           {users.map((u) => (
-            <tr key={u.id} className="border-t">
+            <tr key={u.id} className="border-t border-gray-200">
               <td className="px-4 py-2">{u.email}</td>
 
               <td className="px-4 py-2 text-center">
