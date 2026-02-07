@@ -1,8 +1,10 @@
+import dotenv from "dotenv";
+dotenv.config();
 import axios from "axios";
 import { useAuthStore } from "../auth/authStore";
 
 const api = axios.create({
-  baseURL: "http://localhost:3000/",
+  baseURL: process.env.VITE_API_URL,
   withCredentials: true,
 });
 
