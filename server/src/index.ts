@@ -16,8 +16,22 @@ const app = express();
 // 1. CORS Setup - ระบุที่อยู่ของ React และเปิด credentials
 app.use(
   cors({
-    origin: process.env.CLIENT_URL, // URL ฝั่ง Frontend
-    credentials: true, // อนุญาตให้รับ-ส่ง Cookie และ Header
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+
+      const allowedOrigins = [
+        process.env.CLIENT_URL, // production
+        "http://localhost:5173", // dev
+      ];
+
+      // อนุญาตทุก *.vercel.app
+      if (allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed"));
+      }
+    },
+    credentials: true,
   }),
 );
 

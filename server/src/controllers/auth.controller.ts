@@ -92,8 +92,8 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     // 5. ส่ง Refresh Token ผ่าน HttpOnly Cookie (ปลอดภัยที่สุด)
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true, // Frontend อ่านค่านี้ไม่ได้ ป้องกัน XSS
-      secure: process.env.NODE_ENV === "production", // ใช้ HTTPS เฉพาะบน Production
-      sameSite: "strict", // ป้องกัน CSRF
+      secure: true, // ใช้ HTTPS เฉพาะบน Production
+      sameSite: "none", // ป้องกัน CSRF
       maxAge: 7 * 24 * 60 * 60 * 1000, // อายุ 7 วัน (ตรงกับ JWT)
     });
 
