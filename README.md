@@ -38,6 +38,7 @@ npm run dev
 ```
 
 ![Home Page](images/home.png)
+![Register page](images/register.png)
 ![Admin login](images/admin-login.png)
 ![Dashboard for admin](images/dashboard.png)
 ![Client login](images/client-login.png)

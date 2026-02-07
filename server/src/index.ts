@@ -16,7 +16,7 @@ const app = express();
 // 1. CORS Setup - ระบุที่อยู่ของ React และเปิด credentials
 app.use(
   cors({
-    origin: "http://localhost:5173", // URL ฝั่ง Frontend
+    origin: process.env.VITE_API_URL, // URL ฝั่ง Frontend
     credentials: true, // อนุญาตให้รับ-ส่ง Cookie และ Header
   }),
 );
