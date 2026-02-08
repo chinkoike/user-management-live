@@ -6,12 +6,18 @@ import type { DashboardResponse, DashboardStats } from "../types/dashboard";
 import type { User } from "../types/user";
 import TaskSkeleton from "../components/TaskSkeleton";
 import { useAuthStore } from "../auth/authStore";
+import { StatCard } from "../components/Dashboard/StatCard";
+import { UserTable } from "../components/Dashboard/UserTable";
+import CreateUser from "../components/Dashboard/CreateUser";
 
 export default function DashboardPage() {
   const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
   const { user } = useAuthStore();
   useEffect(() => {
     api
@@ -38,6 +44,32 @@ export default function DashboardPage() {
 
     setUsers((prev) => prev.map((u) => (u.id === userId ? res.data : u)));
   };
+
+  const handleCreateUser = async (data: {
+    email: string;
+    password: string;
+    role: "user" | "admin";
+  }) => {
+    try {
+      const res = await api.post("/dashboard/users", data);
+
+      // ✅ เพิ่ม user ใหม่เข้า state
+      setUsers((prev) => [res.data.user, ...prev]);
+
+      setOpen(false);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(err.message);
+      } else {
+        alert("เกิดข้อผิดพลาด");
+      }
+    }
+  };
+
+  const filteredUsers = users.filter((u) =>
+    u.email.toLowerCase().includes(search.toLowerCase()),
+  );
+
   if (loading) return <TaskSkeleton />;
 
   return (
@@ -49,120 +81,33 @@ export default function DashboardPage() {
           <StatCard title="Pending" value={stats.pendingTasks} />
         </div>
       )}
-
+      <input
+        type="text"
+        placeholder="ค้นหา email ผู้ใช้..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="border rounded px-3 py-2 w-64"
+      />
       <UserTable
-        users={users}
+        users={filteredUsers}
         onChangeRole={handleChangeRole}
         onChangeStatus={handleChangeStatus}
         currentAdminId={user?.id || 0}
       />
-      <LogoutButton />
-    </div>
-  );
-}
-
-function StatCard({ title, value }: { title: string; value: number }) {
-  return (
-    <div className="bg-white p-4 rounded-xl shadow">
-      <p className="text-gray-500">{title}</p>
-      <p className="text-3xl font-bold">{value}</p>
-    </div>
-  );
-}
-
-function UserTable({
-  users,
-  onChangeRole,
-  onChangeStatus,
-  currentAdminId,
-}: {
-  users: User[];
-  onChangeRole: (userId: number, role: "admin" | "user") => void;
-  onChangeStatus: (userId: number, status: "active" | "banned") => void;
-  currentAdminId: number;
-}) {
-  return (
-    <div className="bg-white rounded-xl shadow overflow-hidden">
-      <table className="w-full text-sm">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="px-4 py-2 text-left">Email</th>
-            <th className="px-4 py-2 text-center">Role</th>
-            <th className="px-4 py-2 text-center">Status</th>
-            <th className="px-4 py-2 text-center">Created</th>
-            <th className="px-4 py-2 text-center">Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {users.map((u) => {
-            const isSelf = u.id === currentAdminId;
-            const isBanned = u.status === "banned";
-
-            return (
-              <tr key={u.id} className="border-t">
-                {/* Email */}
-                <td className="px-4 py-2">{u.email}</td>
-
-                {/* Role */}
-                <td className="px-4 py-2 text-center">
-                  <select
-                    value={u.role}
-                    disabled={isBanned}
-                    onChange={(e) =>
-                      onChangeRole(u.id, e.target.value as "admin" | "user")
-                    }
-                    className="border rounded px-2 py-1 disabled:opacity-50"
-                  >
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </td>
-
-                {/* Status */}
-                <td className="px-4 py-2 text-center">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium
-                ${
-                  isBanned
-                    ? "bg-red-100 text-red-600"
-                    : "bg-green-100 text-green-600"
-                }`}
-                  >
-                    {u.status}
-                  </span>
-                </td>
-
-                {/* Created */}
-                <td className="px-4 py-2 text-center">
-                  {new Date(u.createdAt).toLocaleDateString()}
-                </td>
-
-                {/* Action */}
-                <td className="px-4 py-2 text-center">
-                  {!isSelf && (
-                    <button
-                      onClick={() =>
-                        onChangeStatus(u.id, isBanned ? "active" : "banned")
-                      }
-                      className={`px-3 py-1 rounded text-xs font-medium
-                  ${
-                    isBanned
-                      ? "bg-green-500 text-white hover:bg-green-600"
-                      : "bg-red-500 text-white hover:bg-red-600"
-                  }`}
-                    >
-                      {isBanned ? "Unban" : "Ban"}
-                    </button>
-                  )}
-
-                  {isSelf && <span className="text-gray-400 text-xs">You</span>}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <div className="flex justify-between items-center">
+        <button
+          onClick={() => setOpen(true)}
+          className="px-4 py-2 bg-green-600 text-white rounded-lg"
+        >
+          + เพิ่มผู้ใช้
+        </button>
+        <LogoutButton />
+      </div>
+      <CreateUser
+        open={open}
+        onClose={() => setOpen(false)}
+        onSubmit={handleCreateUser}
+      />
     </div>
   );
 }

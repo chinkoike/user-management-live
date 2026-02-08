@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { pool } from "../db/pool";
+import { AppError } from "../utils/appError";
+import bcrypt from "bcrypt";
 
 export const dashboardController = async (req: Request, res: Response) => {
   try {
@@ -113,3 +115,44 @@ export const changeUserStatus = async (req: Request, res: Response) => {
 
   res.json(result.rows[0]);
 };
+// create user
+export async function adminCreateUser(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const { email, password, role } = req.body;
+
+    if (!email || !password || !role) {
+      throw new AppError("ข้อมูลไม่ครบ", 400);
+    }
+
+    // ✅ validate role
+    if (!["user", "admin"].includes(role)) {
+      throw new AppError("Invalid role", 400);
+    }
+
+    // ✅ เช็ค email ซ้ำ
+    const exists = await pool.query("SELECT id FROM users WHERE email = $1", [
+      email,
+    ]);
+    if (exists.rowCount) {
+      throw new AppError("อีเมลนี้ถูกใช้งานไปแล้ว", 400);
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await pool.query(
+      "INSERT INTO users (email, password, role) VALUES ($1, $2, $3) RETURNING id, email, role",
+      [email, hashedPassword, role],
+    );
+
+    res.status(201).json({
+      message: "สร้างผู้ใช้สำเร็จ",
+      user: result.rows[0],
+    });
+  } catch (err) {
+    next(err);
+  }
+}
