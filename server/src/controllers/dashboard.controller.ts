@@ -144,7 +144,15 @@ export async function adminCreateUser(
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
-      "INSERT INTO users (email, password, role) VALUES ($1, $2, $3) RETURNING id, email, role",
+      `
+  INSERT INTO users (email, password, role)
+  VALUES ($1, $2, $3)
+  RETURNING 
+    id, 
+    email, 
+    role, 
+    created_at AS "createdAt"
+  `,
       [email, hashedPassword, role],
     );
 
