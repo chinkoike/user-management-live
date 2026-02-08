@@ -1,35 +1,35 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { JwtPayload } from "../types/auth";
-import { AppError } from "../utils/appError"; // ใช้ AppError ที่คุณมี
+import { AppError } from "../utils/appError";
 
 export function auth(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
 
-  // 1. ตรวจสอบเบื้องต้นว่ามี Header และขึ้นต้นด้วย Bearer หรือไม่
+  // 1. ตรวจ header
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return next(
       new AppError("Authorization header missing or invalid format", 401),
     );
   }
-  if (req.user.status === "banned") {
-    return res.status(403).json({ message: "Account suspended" });
-  }
+
   const token = authHeader.split(" ")[1];
 
   try {
-    // 2. ตรวจสอบความถูกต้องของ Access Token
+    // 2. verify token
     const payload = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
 
-    // 3. เก็บข้อมูลลง req.user
-    // (อย่าลืมทำไฟล์ src/types/express.d.ts เพื่อขยายความสามารถของ Request)
+    // 3. set req.user ก่อน
     req.user = payload;
+
+    // 4. ค่อยเช็คสถานะ user
+    if (req.user.status === "banned") {
+      return next(new AppError("Account suspended", 403));
+    }
 
     next();
   } catch (err: any) {
-    // 4. แยกแยะ Error เพื่อให้ Axios Interceptor ฝั่ง React รู้ว่าต้อง Refresh Token
     if (err.name === "TokenExpiredError") {
-      // สำคัญมาก! ต้องส่ง 401 เพื่อให้ Interceptor ทำงาน
       return next(new AppError("Token expired", 401));
     }
 
