@@ -12,7 +12,9 @@ export function auth(req: Request, res: Response, next: NextFunction) {
       new AppError("Authorization header missing or invalid format", 401),
     );
   }
-
+  if (req.user.status === "banned") {
+    return res.status(403).json({ message: "Account suspended" });
+  }
   const token = authHeader.split(" ")[1];
 
   try {

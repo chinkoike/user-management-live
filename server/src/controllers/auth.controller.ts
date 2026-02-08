@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { pool } from "../db/pool";
-import { JwtPayload } from "../types/auth";
+import { JwtPayload, LoginBody, RegisterBody } from "../types/auth";
 import { AppError } from "../utils/appError"; // Import AppError ที่คุณสร้างไว้
 
 /* ---------------- REGISTER ---------------- */
@@ -12,7 +12,7 @@ export async function register(
   next: NextFunction,
 ) {
   try {
-    const { email, password, role } = req.body;
+    const { email, password, role } = req.body as RegisterBody;
 
     // 1. Validation (ตรวจสอบความครบถ้วน)
     if (!email || !password) {
@@ -49,7 +49,7 @@ export async function register(
 //* ---------------- LOGIN (Updated) ---------------- */
 export async function login(req: Request, res: Response, next: NextFunction) {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body as LoginBody;
 
     if (!email || !password) {
       return next(new AppError("กรุณากรอกอีเมลและรหัสผ่าน", 400));
@@ -71,6 +71,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       userId: user.id,
       email: user.email,
       role: user.role,
+      status: user.status,
     };
 
     const accessToken = jwt.sign(payload, process.env.JWT_SECRET!, {

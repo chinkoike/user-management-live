@@ -42,10 +42,16 @@ export const dashboardController = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to load dashboard" });
   }
 };
-
+// Change user role
 export const changeUserRole = async (req: Request, res: Response) => {
   const userId = Number(req.params.id);
   const { role } = req.body;
+  if (req.user?.role !== "admin") {
+    return res.status(403).json({ message: "Admin only" });
+  }
+  if (req.user.userId === userId) {
+    return res.status(400).json({ message: "Cannot change your own role" });
+  }
 
   if (!["admin", "user"].includes(role)) {
     return res.status(400).json({ message: "Invalid role" });
@@ -77,4 +83,33 @@ export const adminOnly = (req: Request, res: Response, next: NextFunction) => {
     return res.status(403).json({ message: "Admin only" });
   }
   next();
+};
+// Change user status
+export const changeUserStatus = async (req: Request, res: Response) => {
+  if (req.user?.role !== "admin") {
+    return res.status(403).json({ message: "Admin only" });
+  }
+
+  const userId = Number(req.params.id);
+  const { status } = req.body;
+
+  if (!["active", "banned"].includes(status)) {
+    return res.status(400).json({ message: "Invalid status" });
+  }
+
+  if (req.user.userId === userId) {
+    return res.status(400).json({ message: "Cannot ban yourself" });
+  }
+
+  const result = await pool.query(
+    `
+    UPDATE users
+    SET status = $1
+    WHERE id = $2
+    RETURNING id, email, role, status
+    `,
+    [status, userId],
+  );
+
+  res.json(result.rows[0]);
 };
