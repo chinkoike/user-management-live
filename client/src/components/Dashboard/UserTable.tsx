@@ -12,8 +12,8 @@ export function UserTable({
   currentAdminId: number;
 }) {
   return (
-    <div className="bg-white rounded-xl shadow overflow-hidden">
-      <table className="w-full text-sm">
+    <div className=" bg-white rounded-xl  shadow overflow-x-auto">
+      <table className="w-full text-sm justify-center ">
         <thead className="bg-gray-100">
           <tr>
             <th className="px-4 py-2 text-left">Email</th>
@@ -30,7 +30,7 @@ export function UserTable({
             const isBanned = u.status === "banned";
 
             return (
-              <tr key={u.id} className="border-t">
+              <tr key={u.id} className="border-t border-gray-200">
                 {/* Email */}
                 <td className="px-4 py-2">{u.email}</td>
 
@@ -42,7 +42,7 @@ export function UserTable({
                     onChange={(e) =>
                       onChangeRole(u.id, e.target.value as "admin" | "user")
                     }
-                    className="border rounded px-2 py-1 disabled:opacity-50"
+                    className="border border-gray-300 rounded px-2 py-1 disabled:opacity-50"
                   >
                     <option value="user">User</option>
                     <option value="admin">Admin</option>

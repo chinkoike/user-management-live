@@ -73,7 +73,7 @@ export default function DashboardPage() {
   if (loading) return <TaskSkeleton />;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className=" p-6 space-y-6">
       {stats && (
         <div className="grid grid-cols-3 gap-4">
           <StatCard title="Users" value={stats.users} />
@@ -81,13 +81,15 @@ export default function DashboardPage() {
           <StatCard title="Pending" value={stats.pendingTasks} />
         </div>
       )}
-      <input
-        type="text"
-        placeholder="ค้นหา email ผู้ใช้..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="border rounded px-3 py-2 w-64"
-      />
+      <div className="flex  justify-center items-center ">
+        <input
+          type="text"
+          placeholder="ค้นหา email ผู้ใช้..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border border-gray-400 rounded px-3 py-2 w-full md:w-4xl text-gray-700 "
+        />
+      </div>
       <UserTable
         users={filteredUsers}
         onChangeRole={handleChangeRole}
@@ -97,7 +99,7 @@ export default function DashboardPage() {
       <div className="flex justify-between items-center">
         <button
           onClick={() => setOpen(true)}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg"
+          className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-700"
         >
           + เพิ่มผู้ใช้
         </button>
