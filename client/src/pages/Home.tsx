@@ -17,8 +17,8 @@ const LandingPage: React.FC = () => {
             </h1>
 
             <p className="mt-6 text-lg text-gray-600">
-              TaskMaster ช่วยให้คุณจัดการงาน ติดตามความคืบหน้า
-              และทำงานได้อย่างมีประสิทธิภาพมากขึ้น
+              Task Management System พร้อม Role-based Access
+              แยกสิทธิ์การใช้งานระหว่าง Admin และ User อย่างชัดเจน
             </p>
 
             <div className="mt-8 flex gap-4">
