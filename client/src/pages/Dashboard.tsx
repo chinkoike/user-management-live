@@ -51,7 +51,7 @@ export default function DashboardPage() {
     role: "user" | "admin";
   }) => {
     try {
-      const res = await api.post("/dashboard/users", data);
+      const res = await api.post("/dashboard/user", data);
 
       // ✅ เพิ่ม user ใหม่เข้า state
       setUsers((prev) => [res.data.user, ...prev]);
