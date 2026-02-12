@@ -6,15 +6,3 @@ export interface JwtPayload {
   role: Role;
   status: UserStatus;
 }
-
-export interface LoginBody {
-  email: string;
-  password: string;
-  role?: Role;
-}
-
-export interface RegisterBody {
-  email: string;
-  password: string;
-  role?: Role;
-}
