@@ -8,16 +8,16 @@ export default function LogoutButton() {
 
   const handleLogout = async () => {
     try {
-      // 1️⃣ แจ้ง backend ให้ clear refreshToken (cookie)
+      // 1️ แจ้ง backend ให้ clear refreshToken (cookie)
       await api.post("/auth/logout");
     } catch (err) {
-      // ❗ ต่อให้ backend พัง ก็ logout ฝั่ง client ต่อ
+      //  ต่อให้ backend พัง ก็ logout ฝั่ง client ต่อ
       console.warn("Logout API failed", err);
     } finally {
-      // 2️⃣ เคลียร์ client state
+      // 2️ เคลียร์ client state
       clearAuth();
 
-      // 3️⃣ กลับหน้า login
+      // 3️ กลับหน้า login
       navigate("/login", { replace: true });
     }
   };
